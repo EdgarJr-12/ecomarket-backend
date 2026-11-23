@@ -1,0 +1,24 @@
+name: CI - Integración Continua EcoMarket
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar código del repositorio
+        uses: actions/checkout@v4
+
+      - name: Construir imagen Docker del Backend
+        run: docker build -t ecomarket-backend:test .
+
+      - name: Verificar contenedor en ejecución
+        run: |
+          docker run -d -p 3000:3000 --name test-api ecomarket-backend:test
+          sleep 3
+          curl -f http://localhost:3000/health
+          docker stop test-api
